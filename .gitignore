@@ -1,0 +1,11 @@
+.DS_Store
+/app/
+/notebooks/
+/reports/
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.build/
+*.swp
+*.tmp
