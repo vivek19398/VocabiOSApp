@@ -13,6 +13,7 @@ The bundled `vocabulary.json` currently contains `5005` vocabulary entries extra
 - `I Know This` and `Need Practice` actions
 - Review tab for weak words from every day
 - Multiple-choice quiz mode with instant correct/wrong feedback
+- Ask tab for English-only vocabulary and grammar questions
 - Local persistence through `UserDefaults`
 - Offline-first JSON vocabulary data
 - 1024 x 1024 app icon asset included as `AppIcon-1024.png`
@@ -29,6 +30,9 @@ VocabiOSApp
 ├── FlashcardView.swift       Day-specific flashcard study experience
 ├── ReviewView.swift          Weak-word review flow
 ├── QuizView.swift            Multiple-choice quiz flow
+├── EnglishAssistantView.swift Ask tab chat interface
+├── EnglishAssistantService.swift English-only guard and assistant state
+├── LocalLLMService.swift     Optional local GGUF model adapter
 ├── vocabulary.json           Bundled local vocabulary dataset
 └── AppIcon-1024.png          iOS app icon source image
 ```
@@ -84,6 +88,18 @@ Builds multiple-choice questions from local vocabulary meanings. Incorrect answe
 
 Owns all vocabulary state, JSON loading, day filtering, progress calculation, review filtering, and local persistence.
 
+`EnglishAssistantView`
+
+Adds an Ask tab where users can ask about meanings, examples, grammar, usage, synonyms, antonyms, and sentence correction.
+
+`EnglishAssistantService`
+
+Keeps chat state, blocks non-English-learning topics, builds the model prompt, and falls back to bundled vocabulary/basic grammar until a local model is installed.
+
+`LocalLLMService`
+
+Looks for a bundled `english-assistant.gguf` model and uses the optional `SwiftLlama` package when available. The app still builds without the package or model, but it will show setup guidance in the Ask tab.
+
 ## Persistence
 
 The app saves only progress, not a modified copy of the whole vocabulary file.
@@ -133,6 +149,35 @@ gre-vocabulary-progress-v1
 10. Select `vocabulary.json` and confirm it is included under **Target Membership**.
 11. Open `Assets.xcassets > AppIcon` and drag `AppIcon-1024.png` into the 1024 x 1024 app icon slot.
 12. Build and run on an iPhone simulator or a connected iPhone.
+
+## Free Local Hugging Face LLM Setup
+
+The Ask tab is wired for a free local Hugging Face GGUF model. The model file is intentionally not committed because even small models are hundreds of MB.
+
+Recommended small free model:
+
+- `Qwen/Qwen2-0.5B-Instruct-GGUF`
+- Use a 4-bit file such as `qwen2-0_5b-instruct-q4_k_m.gguf` if available
+- Approximate size: about `398 MB`
+
+Smaller alternative:
+
+- `jc-builds/SmolLM2-360M-Instruct-Q4_K_M-GGUF`
+- Approximate size: about `271 MB`
+
+In Xcode:
+
+1. Choose **File > Add Package Dependencies...**.
+2. Add `https://github.com/pgorzelany/swift-llama-cpp`.
+3. Add the `SwiftLlama` product to your app target.
+4. Download a `.gguf` model from Hugging Face.
+5. Rename the downloaded file to `english-assistant.gguf`.
+6. Drag `english-assistant.gguf` into Xcode.
+7. Check **Copy items if needed**.
+8. Make sure the app target is checked under **Target Membership**.
+9. Build and run on your iPhone.
+
+After this, the Ask tab runs the model locally on the device. No backend or paid API is needed.
 
 ## Signing For iPhone
 

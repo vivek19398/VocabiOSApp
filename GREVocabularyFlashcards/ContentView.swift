@@ -23,6 +23,13 @@ struct ContentView: View {
             .tabItem {
                 Label("Quiz", systemImage: "checkmark.circle.fill")
             }
+
+            NavigationStack {
+                EnglishAssistantView()
+            }
+            .tabItem {
+                Label("Ask", systemImage: "text.bubble.fill")
+            }
         }
         .tint(AppColors.teal)
     }
